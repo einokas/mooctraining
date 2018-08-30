@@ -25,7 +25,7 @@ const App = () => {
     )
 }
 
-  const Otsikko = (props) => {
+const Otsikko = (props) => {
     return (
         <div>
           <h1>{props.kurssi}</h1>
