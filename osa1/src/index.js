@@ -1,32 +1,39 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+class App extends React.Component {
+  constructor() {
+    super()
+    this.state = {
+      counter: 1
+    }
+    this.kasvataYhdella = this.kasvataYhdella.bind(this)
+    this.nollaa = this.nollaa.bind(this)
+  }
 
-const Hello = (props) => {
+  kasvataYhdella() {
+    this.setState({ counter: this.state.counter + 1 })
+  }
+
+  nollaa() {
+    this.setState({ counter: 0 })
+  }
+
+  render() {
     return (
       <div>
-        <p>Hello {props.name}, you are {props.age} years old</p>
+        <div>{this.state.counter}</div>
+        <div>
+          <button onClick={this.kasvataYhdella}>
+            plus
+          </button>
+          <button onClick={this.nollaa}>
+            zero
+          </button>
+        </div>
       </div>
     )
   }
-  
-  const App = () => {
-      const nimi = 'Pekka'
-      const ika = 10
-    return( 
-        [
-        <h1>Greetings</h1>,
-        <Hello name="Arto" age = {26 + 10} />,
-        <Hello name={nimi} age = {ika} />,
-        <Footer />
-        ]
-    )
-  }
+}
 
-  const Footer = () => {
-    return (
-      <div>greeting app created by <a href="https://github.com/einokas">erik</a></div>
-    )
-  }
-  
-  ReactDOM.render(<App />, document.getElementById('root'))
+ReactDOM.render(<App />, document.getElementById('root'))
