@@ -76,7 +76,7 @@ class App extends React.Component {
                 />
             </div>
             <div>
-                <button type="submit">lisää</button> 
+                <button type="submit">lisää</button>
             </div>
         </form>
         <h2>Numerot</h2>
