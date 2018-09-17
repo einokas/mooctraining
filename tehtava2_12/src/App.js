@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import axios from 'axios'
 
-let summa = 0;
+let summa = 250;
 
 class App extends Component {
 
@@ -10,8 +10,7 @@ class App extends Component {
     super(props)
     this.state = {
       countrys: [],
-      filter: '',
-      match: 0
+      filter: ''
     }
     console.log('constructor')
   }
@@ -29,19 +28,12 @@ class App extends Component {
     console.log(event.target.value)
     this.setState({ filter: event.target.value })
   }
-  presenter() {
-    summa = 0
-    this.state.countrys.map(country => (country.name.toUpperCase().includes(this.state.filter.toUpperCase())? summa = summa + 1:null))
-    console.log(summa)
-    this.setState({match: summa})
-  }
-
 
   render() {
     return (
       <div>
         <h2>Countries</h2>
-        <form onSubmit = {this.addPerson}>
+        <form>
         <div>
         Find countries: <input 
         value = {this.state.filter}
@@ -50,10 +42,11 @@ class App extends Component {
         </div>
         </form>
         <p>
+        {<Match countrys={this.state.countrys} filter={this.state.filter} />}
         </p>
         <table><tbody>
-        {this.state.countrys.map(country => (country.name.toUpperCase().includes(this.state.filter.toUpperCase())? <Display key={country.name} country={country} /> :"" ) )}
-       
+        {(summa <11)? this.state.countrys.map(country => (country.name.toUpperCase().includes(this.state.filter.toUpperCase())? <Display key={country.name} country={country} /> :"" ) ): null}
+        {(summa >10)? "too many matches, specify more letters":null}
         </tbody>
         </table>
       </div>
@@ -63,5 +56,13 @@ class App extends Component {
 const Display = ({ country }) => {
     return (<tr><td>{country.name}</td></tr>)
   }
+
+const Match = ({filter, countrys}) =>
+{
+  summa = 0
+  countrys.map(country => (country.name.toUpperCase().includes(filter.toUpperCase())? summa = summa + 1:null))
+  console.log(summa)
+    return(summa)
+}
 
 export default App;
