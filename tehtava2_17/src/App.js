@@ -15,7 +15,7 @@ class App extends Component {
     console.log('constructor')
   }
     addPerson = (event) => {
-        let helpb = true
+        let helpb = -1
         event.preventDefault()
         const personObject = {
                name: this.state.newName,
@@ -25,25 +25,42 @@ class App extends Component {
         for (let person of this.state.persons) {
             console.log(person.name)
             if (person.name === personObject.name) {
-                helpb = false
+                helpb = person.id
             }
         }
-        if(helpb){
-        const person = this.state.persons.concat(personObject)
-                this.setState({
-                    persons: person
-                })
+        //new customer
+        if(helpb === -1){
+          const person = this.state.persons.concat(personObject)
+              this.setState({
+                persons: person
+              })
+          personService
+            .create(personObject)
+            .then(response => {
+              console.log(response)
+            })
         }
+        //update excisting customer
+        else{
+          let confirm = window.confirm(personObject.name+ ' on jo luettelossa, päivitetäänkö numero')
+            if(confirm === true){
+              personService
+                .update(helpb, personObject)
+                .then(response => {
+                  console.log("opdated", response)
+                })
+            }
+            else{
+              console.log("not updated")
+            }
+            window.open(' ','_self')
+          }
+
         this.setState({
             newName: "",
             newNumber: "" }
         )
 
-        personService
-          .create(personObject)
-          .then(response => {
-            console.log(response)
-            })
     }
     handlePersonChange = (event) => {
         console.log(event.target.value)

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import personService from './services/persons'
+import Notification from './services/Notification'
 
 class App extends Component {
   
@@ -10,12 +11,13 @@ class App extends Component {
       persons: [],
       newName: '',
       newNumber: '',
-      filter: ''
+      filter: '',
+      change:''
     }
     console.log('constructor')
   }
     addPerson = (event) => {
-        let helpb = true
+        let helpb = -1
         event.preventDefault()
         const personObject = {
                name: this.state.newName,
@@ -25,25 +27,48 @@ class App extends Component {
         for (let person of this.state.persons) {
             console.log(person.name)
             if (person.name === personObject.name) {
-                helpb = false
+                helpb = person.id
             }
         }
-        if(helpb){
-        const person = this.state.persons.concat(personObject)
-                this.setState({
-                    persons: person
-                })
+        //new customer
+        if(helpb === -1){
+          const person = this.state.persons.concat(personObject)
+              this.setState({
+                persons: person,
+                change: `henkilö '${personObject.name}' on lisätty luetteloon`
+              })
+          personService
+            .create(personObject)
+            .then(response => {
+              console.log(response)
+            })
         }
+        //update excisting customer
+        else{
+          let confirm = window.confirm(personObject.name+ ' on jo luettelossa, päivitetäänkö numero')
+            if(confirm === true){
+              personService
+                .update(helpb, personObject)
+                .then(response => {
+                  console.log("opdated", response)
+                })
+              this.setState({
+                change: `henkilö '${personObject.name}' on päivitetty luetteloon`
+              })
+            }
+            else{
+              console.log("not updated")
+            }
+        }
+
         this.setState({
             newName: "",
             newNumber: "" }
         )
-
-        personService
-          .create(personObject)
-          .then(response => {
-            console.log(response)
-            })
+          setTimeout(() => {
+            window.open(' ','_self')
+            this.setState({change: null})
+          }, 5000)
     }
     handlePersonChange = (event) => {
         console.log(event.target.value)
@@ -67,10 +92,33 @@ class App extends Component {
       })
     }
     
+      removal = (id, name) => {
+        let confirm = window.confirm('poistetaanko henkilö '+ name)
+        if(confirm === true){
+          personService
+         .remove(id)
+         .then(response => {
+            console.log("deleted", response)
+          })
+          this.setState({
+            change: `henkilö '${name}' on poistettu luettelosta`
+          })
+          setTimeout(() => {
+            window.open(' ','_self')  
+            this.setState({change: null})
+          }, 5000)
+        }
+        else{
+          console.log("not deleted")
+        } 
+        // 
+      }
+    
   render() {
     return (
       <div>
         <h2>Puhelinluettelo</h2>
+        <Notification message={this.state.change}/>
         <form onSubmit={this.addPerson}>
             <div>
                 rajaa näytettäviä: <input 
@@ -98,34 +146,12 @@ class App extends Component {
         <h2>Numerot</h2>
         <table>
           <tbody>
-            {this.state.persons.map(person => (person.name.toUpperCase().includes(this.state.filter.toUpperCase())? <Display key={person.name} person={person}/>:""))}
+            {this.state.persons.map(person => ( person.name.toUpperCase().includes(this.state.filter.toUpperCase())? <tr key = {person.name} ><td>{person.name}</td><td>{person.number}</td><td><button onClick ={() => this.removal(person.id, person.name)}>poista</button></td></tr> :""))}
           </tbody>
         </table>
       </div>
     )
   }
-}
-
-const Display = ({ person }) => {
-    return (
-      <tr><td>{person.name}</td><td>{person.number}</td><td><button onClick ={() => removal(person.id, person.name)}>poista</button></td></tr>
-    )
-  }
-
-const removal = (id, name) => {
-  
-  let confirm = window.confirm('poistetaanko henkilö '+ name)
-  if(confirm === true){
-    personService
-    .remove(id)
-    .then(response => {
-      console.log("deleted", response)
-    })
-  }
-  else{
-    console.log("not deleted")
-  }
-  window.open(' ','_self')
 }
 
 export default App;
